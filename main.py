@@ -241,4 +241,4 @@ if __name__ == '__main__':
     # Open webbrowser tab for the app
     webbrowser.open_new_tab("http://localhost:5000")
 
-    app.run()
+    app.run(host="0.0.0.0")
