@@ -113,11 +113,15 @@ def train():
 
 
 def maybe_restore_model(model_path, saver, sess, accuracy, validation_data, x, validation_labels, y_):
+    exists = os.path.isfile(model_path)
+    if not exists:
+        return 0
+
     try:
         saver.restore(sess, model_path)
         # save the current maximum accuracy value for validation data
         max_acc = sess.run(accuracy, feed_dict={x: validation_data, y_: validation_labels})
-    except (NotFoundError, InvalidArgumentError):
+    except:
         # initialize the maximum accuracy value for validation data
         max_acc = 0.
     return max_acc
