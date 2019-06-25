@@ -9,4 +9,6 @@ RUN apt-get update -y && apt-get install -y libglib2.0-0 libsm6 libxrender1 libx
 
 EXPOSE 5000
 
+VOLUME /opt/smiley
+
 CMD ["python", "main.py"]

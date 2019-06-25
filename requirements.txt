@@ -1,5 +1,5 @@
 Flask==1.0.2
-numpy==1.15.0
+numpy==1.16.4
 scipy==1.1.0
 tensorflow==1.13.1
 pypng==0.0.18
