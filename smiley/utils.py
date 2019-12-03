@@ -4,6 +4,11 @@ import sys
 import png
 import math
 import shutil
+import string
+import random
+
+sessionId = ''.join([random.choice(string.ascii_letters 
+            + string.digits) for n in range(10)])
 
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
@@ -162,7 +167,7 @@ def save_image(image, path):
     # store new training example image
     image_size = int(config['DEFAULT']['IMAGE_SIZE'])
     w = png.Writer(image_size, image_size, greyscale=True)
-    w.write(open(path + "/" + str(image_name) + ".png", "wb"), image)
+    w.write(open(path + "/" + sessionId + "_" + str(image_name) + ".png", "wb"), image)
 
 
 # Deletes the folder of the category
