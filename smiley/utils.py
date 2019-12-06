@@ -7,9 +7,6 @@ import shutil
 import string
 import random
 
-sessionId = ''.join([random.choice(string.ascii_letters 
-            + string.digits) for n in range(10)])
-
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
 
@@ -162,12 +159,13 @@ def add_training_example(image, category):
 
 def save_image(image, path):
     # name for new training example image
-    image_name = max([0] + [int(x.split(".")[0]) for x in [a for a in os.listdir(path) if a.split(".")[-1] == "png" and a.split(".")[0].isdigit()]]) + 1
+    randomId = ''.join([random.choice(string.ascii_letters 
+            + string.digits) for n in range(10)])
 
     # store new training example image
     image_size = int(config['DEFAULT']['IMAGE_SIZE'])
     w = png.Writer(image_size, image_size, greyscale=True)
-    w.write(open(path + "/" + sessionId + "_" + str(image_name) + ".png", "wb"), image)
+    w.write(open(path + "/" + randomId + ".png", "wb"), image)
 
 
 # Deletes the folder of the category

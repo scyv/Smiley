@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+smiley/data/**/*.png
+
 # Generated logs and models
 logs/
 models/
+.vscode
+.idea
