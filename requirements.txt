@@ -1,7 +1,7 @@
 Flask==1.0.2
-numpy==1.16.4
-scipy==1.1.0
-tensorflow==1.13.1
-pypng==0.0.18
-image==1.5.24
-opencv-python==3.4.2.17
+numpy==1.21.4
+scipy==1.7.2
+tensorflow==2.7.0
+pypng==0.0.21
+image==1.5.33
+opencv-python==4.5.4.58

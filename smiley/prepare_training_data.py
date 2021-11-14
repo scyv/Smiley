@@ -15,8 +15,8 @@ config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
 
 
 # get images from category folders, add them to training/test images
-def add_data(model, train_images, train_labels, test_images, test_labels, train_ratio):
-    from tensorflow.contrib.keras.api.keras.preprocessing.image import ImageDataGenerator
+def add_data(train_images, train_labels, test_images, test_labels, train_ratio):
+    from tensorflow.keras.preprocessing.image import ImageDataGenerator
     image_size = int(config['DEFAULT']['IMAGE_SIZE'])
 
     datagen = ImageDataGenerator()
@@ -43,11 +43,8 @@ def add_data(model, train_images, train_labels, test_images, test_labels, train_
     while number_processed < number_of_images:
         item = next(generator)
         image = numpy.array(item[0], dtype=numpy.uint8).reshape(1, image_size, image_size, 1)
-        if model == "regression":
-            image = ((255 - image) / 255.0)
-        elif model == "CNN":
-            image = (((255 - image) / 255.0) - 0.5)
-        image = numpy.reshape(image, [1, -1])
+        #image = (((255 - image) / 255.0) - 0.5)
+        #image = numpy.reshape(image, [1, -1])
         label = int(item[1][0])
         number_per_category[label] += 1.0
         labels.append(label)
@@ -151,7 +148,7 @@ def create_validation_set(train_data, train_labels, train_ratio):
 
 
 # augment training data
-def expand_training_data(model, images, labels):
+def expand_training_data(images, labels):
     expanded_images = []
     expanded_labels = []
     image_size = int(config['DEFAULT']['IMAGE_SIZE'])
@@ -165,29 +162,31 @@ def expand_training_data(model, images, labels):
         expanded_images.append(x)
         expanded_labels.append(y)
 
-        # get a value for the background
-        # zero is the expected value, but median() is used to estimate background's value
-        bg_value = numpy.median(x)  # this is regarded as background's value
         image = numpy.reshape(x, (-1, int(config['DEFAULT']['IMAGE_SIZE'])))
-
         num_augm_per_img = int(config['DEFAULT']['NUMBER_AUGMENTATIONS_PER_IMAGE'])
         max_angle = int(config['DEFAULT']['MAX_ANGLE_FOR_AUGMENTATION'])
         for i in range(num_augm_per_img):
-            # rotate the image with random degree
-            angle = numpy.random.randint(-max_angle, max_angle, 1)
-            new_img = ndimage.rotate(image, angle, reshape=False, cval=bg_value)
-
             # shift the image with random distance
             max_shift = int(math.floor(image_size * 0.15))
             shift = numpy.random.randint(-max_shift, max_shift, 2)
-            new_img_ = ndimage.shift(new_img, shift, cval=bg_value)
+            new_img = ndimage.shift(image, shift, cval=255)
+
+            # rotate the image with random degree
+            angle = numpy.random.randint(-max_angle, max_angle, 1)
+            rotate_matrix = cv2.getRotationMatrix2D(center=(image_size, image_size), angle=int(angle), scale=1)
+            new_img = cv2.warpAffine(src=new_img, M=rotate_matrix, dsize=(image_size, image_size), borderValue=(255))
 
             # zoom image while keeping its dimensions
             zoom = numpy.random.uniform(0.5, 1.5)
-            new_img__ = cv2_clipped_zoom(model, new_img_, zoom)
+            new_img = cv2_clipped_zoom(new_img, zoom)
+
+            path = os.path.join(os.path.dirname(__file__), "data", "exp" + str(j))
+            if not os.path.exists(path):
+                os.makedirs(path)
+            utils.save_image(new_img, path)
 
             # register new training data
-            expanded_images.append(numpy.reshape(new_img__, image_size * image_size))
+            expanded_images.append(numpy.reshape(new_img, image_size * image_size))
             expanded_labels.append(y)
 
     # images and labels are concatenated for random-shuffle at each epoch
@@ -199,7 +198,7 @@ def expand_training_data(model, images, labels):
 
 
 # Source: https://stackoverflow.com/questions/37119071/scipy-rotate-and-zoom-an-image-without-changing-its-dimensions
-def cv2_clipped_zoom(model, img, zoom_factor):
+def cv2_clipped_zoom(img, zoom_factor):
     """
     Center zoom in/out of the given image and returning an enlarged/shrinked view of
     the image without changing dimensions
@@ -225,7 +224,7 @@ def cv2_clipped_zoom(model, img, zoom_factor):
     pad_height1, pad_width1 = (height - resize_height) // 2, (width - resize_width) // 2
     pad_height2, pad_width2 = (height - resize_height) - pad_height1, (width - resize_width) - pad_width1
     pad_spec = [(pad_height1, pad_height2), (pad_width1, pad_width2)] + [(0, 0)] * (img.ndim - 2)
-    const_fill_value = -0.5 if model == "CNN" else 0
+    const_fill_value = 255
 
     result = cv2.resize(cropped_img, (resize_width, resize_height))
     result = numpy.pad(result, pad_spec, mode='constant', constant_values=const_fill_value)
@@ -234,7 +233,7 @@ def cv2_clipped_zoom(model, img, zoom_factor):
 
 
 # prepare training data (generated images)
-def prepare_data(model, use_data_augmentation=True):
+def prepare_data(use_data_augmentation=True):
     global NUM_LABELS, config
     NUM_LABELS = len(utils.update_categories())
     config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
@@ -245,21 +244,20 @@ def prepare_data(model, use_data_augmentation=True):
     train_ratio = float(config['DEFAULT']['TRAIN_RATIO'])
 
     # add data from category folders
-    train_data, train_labels, test_data, test_labels = add_data(model, train_data, train_labels, test_data, test_labels,
+    train_data, train_labels, test_data, test_labels = add_data(train_data, train_labels, test_data, test_labels,
                                                                 train_ratio)
 
     # create a validation set
-    train_data, train_labels, validation_data, validation_labels = create_validation_set(train_data, train_labels,
-                                                                                         train_ratio)
+    train_data, train_labels, _, _ = create_validation_set(train_data, train_labels, train_ratio)
 
     # concatenate train_data and train_labels for random shuffle
     if use_data_augmentation:
         # augment training data by random rotations etc.
-        train_total_data = expand_training_data(model, train_data, train_labels)
+        train_total_data = expand_training_data(train_data, train_labels)
     else:
         train_total_data = numpy.concatenate((train_data, train_labels), axis=1)
         numpy.random.shuffle(train_total_data)
 
     train_size = train_total_data.shape[0]  # size of training set
 
-    return NUM_LABELS, train_total_data, train_size, validation_data, validation_labels, test_data, test_labels
+    return NUM_LABELS, train_total_data, train_size, test_data, test_labels

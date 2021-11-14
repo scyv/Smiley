@@ -64,7 +64,7 @@ def update_progress(value):
 def train_should_stop(stop='MISSING'):
     global PROGRESS
 
-    if stop is not 'MISSING':
+    if stop != 'MISSING':
         PROGRESS['stop'] = stop
 
     return PROGRESS['stop']
