@@ -1,17 +1,24 @@
 import configparser
 import os
-import cnn_model
-import numpy
-import prepare_training_data
-import utils
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from tensorflow.python.framework.errors_impl import InvalidArgumentError, NotFoundError
+import smiley.cnn_model as cnn_model
+import smiley.utils as utils
 
+EPOCHS = 0
+
+class ProgressCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        global EPOCHS
+
+        utils.update_progress(100 * epoch / EPOCHS)
 
 def train():
-    print("\nCNN TRAINING STARTED.")
+    global EPOCHS
 
+    print("\nCNN TRAINING STARTED.")
+    utils.update_progress(1)
     config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
 
@@ -19,20 +26,22 @@ def train():
                               config['DEFAULT']['IMAGE_SIZE'], config['CNN']['MODEL_FILENAME'])
     IMAGE_SIZE = int(config['DEFAULT']['IMAGE_SIZE'])
     BATCH_SIZE = int(config['DEFAULT']['TRAIN_BATCH_SIZE'])
-    LOGS_DIRECTORY = os.path.join(os.path.dirname(__file__), config['DIRECTORIES']['LOGS'])
     EPOCHS = int(config['CNN']['EPOCHS'])
 
-    # get training/validation/testing data
-    try:
-        curr_number_of_categories, train_total_data, train_size, test_data, test_labels = prepare_training_data.prepare_data(True)
-    except Exception as inst:
-        raise Exception(inst.args[0])
+    train_datagen = ImageDataGenerator(
+        rescale=1. / 255,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True)
+    train_generator = train_datagen.flow_from_directory(
+        utils.CATEGORIES_LOCATION,
+        color_mode='grayscale',
+        target_size=(IMAGE_SIZE, IMAGE_SIZE),
+        batch_size=BATCH_SIZE,
+        class_mode='binary')
 
-    train_images = numpy.reshape(train_total_data[:, :-curr_number_of_categories], (train_size, -1, IMAGE_SIZE))
-    train_labels = train_total_data[:, -curr_number_of_categories:]
-    model = cnn_model.createModel(curr_number_of_categories)
-    
-    model.fit(train_images, train_labels.T[1], epochs=EPOCHS, batch_size=BATCH_SIZE)
+    model = cnn_model.createModel(train_generator.num_classes)
+
+    model.fit(train_generator, epochs=EPOCHS, callbacks=[ProgressCallback()])
     model.save(MODEL_PATH)
-    model.summary()
     print("CNN TRAINING END.")

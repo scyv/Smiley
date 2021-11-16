@@ -1,16 +1,15 @@
 import configparser
 import math
 import os
-import sys
-import webbrowser
 import numpy as np
 import tensorflow as tf
 
 from flask import Flask, jsonify, render_template, request
 from tensorflow.python.framework.errors_impl import InvalidArgumentError, NotFoundError
 
-sys.path.append('smiley')
-import cnn_model, cnn_train, utils
+import smiley.utils as utils
+import smiley.cnn_train as cnn_train
+import smiley.cnn_model as cnn_model
 
 config = configparser.ConfigParser()
 config.file = os.path.join(os.path.dirname(__file__), 'smiley/config.ini')
@@ -58,7 +57,6 @@ def cnn_predict(input):
 
 # Webapp definition
 app = Flask(__name__)
-
 
 # Root
 @app.route('/')
@@ -156,7 +154,8 @@ def train_models():
         err = utils.get_not_enough_images_error()
         return jsonify(error=err)
 
-    #utils.delete_all_models()
+    utils.update_progress(1)
+
     utils.set_maybe_old(True)
     maybe_update_models()
 
@@ -165,11 +164,9 @@ def train_models():
     except BaseException as trainError:
         print (trainError)
         err = "Unknown error."
-        #utils.delete_all_models()
         return jsonify(error=err)
 
     if utils.train_should_stop():
-        #utils.delete_all_models()
         utils.train_should_stop(False)
     else:
         utils.set_maybe_old(False)

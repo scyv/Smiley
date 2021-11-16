@@ -655,11 +655,11 @@ class Main {
       this.is_training = true;
 
       $(button).children(".progress-bar").addClass("bg-danger");
+      $(button).children(".progress-bar").css("width", "1%");
       $(button)
         .children(".label-progress-bar")
         .text("Stop Training")
         .css("color", "black");
-
       var update_progress = setInterval(function () {
         $.ajax({
           url: "/api/train-progress",
@@ -669,7 +669,7 @@ class Main {
               .css("width", data.progress + "%");
           },
         });
-      }, 800);
+      }, 500);
 
       $.ajax({
         url: "/api/train-models",

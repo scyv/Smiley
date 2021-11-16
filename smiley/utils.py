@@ -14,21 +14,15 @@ MODELS_DIRECTORY = os.path.join(config['DIRECTORIES']['LOGIC'], config['DIRECTOR
                                 config['DEFAULT']['IMAGE_SIZE'])
 CATEGORIES_LOCATION = os.path.join(os.path.dirname(__file__), config['DIRECTORIES']['CATEGORIES'],
                                        config['DEFAULT']['IMAGE_SIZE'] + "/")
-#In config: [DIRECTORIES] categories = T:\categories
-#CATEGORIES_LOCATION = os.path.join(config['DIRECTORIES']['CATEGORIES'],
-#                                       config['DEFAULT']['IMAGE_SIZE'] + "/")
 
 CATEGORIES = None
 CATEGORIES_IN_USE = None
 MAYBE_OLD_VERSION = False
 PROGRESS = {
     'value': 100,
-    'process_dist': [0.1,0.9],
-    'current_process': 0,
     'previous_value': 0,
     'stop': False
 }
-
 
 def is_maybe_old():
     global MAYBE_OLD_VERSION
@@ -51,13 +45,7 @@ def get_progress():
 def update_progress(value):
     global PROGRESS
 
-    PROGRESS['value'] = PROGRESS['previous_value'] + (100*value*PROGRESS['process_dist'][PROGRESS['current_process']])
-    
-    # if process is completed, add its contribution to previous_value
-    if value == 1:
-        PROGRESS['previous_value'] += 100*PROGRESS['process_dist'][PROGRESS['current_process']]
-        PROGRESS['current_process'] += 1
-
+    PROGRESS['value'] = value
     return PROGRESS['value']
 
 

@@ -13,22 +13,21 @@ def createModel(nCategories):
     learning_rate = float(config['CNN']['LEARNING_RATE'])
     model = tf.keras.models.Sequential()
     
+
     model.add(tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(image_size, image_size, 1)))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))
     model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
+
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(1024, activation='relu'))
-    model.add(tf.keras.layers.Dropout(0.2))
+    model.add(tf.keras.layers.Dense(64, activation='relu'))
     model.add(tf.keras.layers.Dense(nCategories))
 
-    #model.add(tf.keras.layers.Flatten(input_shape=(image_size, image_size)))
-    #model.add(tf.keras.layers.Dense(128, activation='relu'))
-    #model.add(tf.keras.layers.Dropout(0.2))
-    #model.add(tf.keras.layers.Dense(nCategories))
-    
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                 loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
-                metrics=[tf.metrics.SparseCategoricalAccuracy()])
+                metrics=['accuracy'])
+
+    model.summary()
 
     return model
