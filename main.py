@@ -49,9 +49,7 @@ def cnn_predict(input):
     model = tf.keras.models.load_model(MODEL_PATH)
     input = np.reshape(input, (1, -1, IMAGE_SIZE))
     prediction = model.predict(input)
-    print(prediction)
     normalized = tf.nn.softmax(prediction).numpy().flatten()
-    print(normalized)
     return normalized
 
 

@@ -4,4 +4,3 @@ scipy==1.7.2
 tensorflow==2.7.0
 pypng==0.0.21
 image==1.5.33
-opencv-python==4.5.4.58
