@@ -14,8 +14,8 @@ We provide an easily understandable and concise backend and frontend capable of 
 
 - We recommend to install [`miniconda`](https://conda.io/miniconda.html)
 
-- Python >=3.5 (recommended 3.6.6)
-  - TensorFlow >=1.9 (recommended 1.9.0)
+- Python >=3.5 (recommended 3.9)
+  - TensorFlow >=2 (recommended 2.7.0)
 
 ### Installation
 
@@ -23,7 +23,7 @@ Start the anaconda prompt and simply follow these instructions:
 
 ```bash
 > # Create and activate the environment
-> conda create --name smiley python=3.6.6
+> conda create --name smiley python=3.9.0
 > activate smiley
 >
 > # Set working directory to project directory

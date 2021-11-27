@@ -60,13 +60,12 @@ app = Flask(__name__)
 @app.route('/')
 def main():
     maxNumUserCat = config['DEFAULT']['MAX_NUMBER_USER_CATEGORIES']
-    numAugm = config['DEFAULT']['NUMBER_AUGMENTATIONS_PER_IMAGE']
     batchSize = config['DEFAULT']['TRAIN_BATCH_SIZE']
     cnnRate = config['CNN']['LEARNING_RATE']
     cnnEpochs = config['CNN']['EPOCHS']
     predefined_categories = config['DEFAULT']['PREDEFINED_CATEGORIES'].split(",")
     
-    data = {'image_size': IMAGE_SIZE, 'numAugm': numAugm, 'batchSize': batchSize, 
+    data = {'image_size': IMAGE_SIZE, 'batchSize': batchSize,
             'cnnRate': cnnRate, 'cnnEpochs': cnnEpochs, 'maxNumUserCat': maxNumUserCat,
             'cats_img_number': utils.get_number_of_images_per_category(),
             'categories': list(set().union(utils.get_category_names(), predefined_categories)),
@@ -134,7 +133,6 @@ def delete_category():
 def update_config():
     config.set("CNN", "LEARNING_RATE", request.json["cnnRate"])
     config.set("CNN", "EPOCHS", request.json["cnnEpochs"])
-    config.set("DEFAULT", "number_augmentations_per_image", request.json["numAugm"])
     config.set("DEFAULT", "train_batch_size", request.json["batchSize"])
 
     # Write config back to file

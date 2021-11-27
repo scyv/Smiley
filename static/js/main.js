@@ -5,7 +5,6 @@ class Main {
     this.ctx = this.canvas.getContext("2d");
     this.input = $("#input")[0];
 
-    this.numAugm = param.numAugm;
     this.batchSize = param.batchSize;
     this.cnnRate = param.cnnRate;
     this.cnnEpochs = param.cnnEpochs;
@@ -75,7 +74,6 @@ class Main {
   }
 
   initializeConfigValues() {
-    $("#num-augm").val(this.numAugm);
     $("#batch-size").val(this.batchSize);
     $("#cnn-rate").val(this.cnnRate);
     $("#cnn-epochs").val(this.cnnEpochs);
@@ -707,7 +705,6 @@ class Main {
 
   updateConfig(form) {
     var ints = {
-      numAugm: $("#num-augm").val(),
       batchSize: $("#batch-size").val(),
       cnnEpochs: $("#cnn-epochs").val(),
     };

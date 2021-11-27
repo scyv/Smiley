@@ -57,13 +57,6 @@
                     <form id="config-form">
                         <div class="card-body">
                             <div class="input-group">
-                                <div class="input-group-prepend"><label class="input-group-text" for="num-augm">Augmentations per image:</label></div>
-                                <input type="number" id="num-augm" class="form-control" value="10">
-                                <div class="input-group-append">
-                                    <label class="input-group-text" for="num-augm"><i class="fa fa-pen"></i></label>
-                                </div>
-                            </div>
-                            <div class="input-group">
                                 <div class="input-group-prepend"><label class="input-group-text" for="batch-size">Batch size:</label></div>
                                 <input type="number" id="batch-size" class="form-control" value="10">
                                 <div class="input-group-append">
@@ -94,10 +87,8 @@
             <div class="relative fixed-size">
                 <div class="btn-group d-flex">
                     <button id="modeDraw" class="btn btn-outline-secondary w-50">Draw <i class="fa fa-paint-brush"></i></button>
-                    <button id="modeCamera" class="btn btn-outline-secondary w-50">Camera <i class="fa fa-camera"></i></button>
                 </div>
                 <canvas id="main"></canvas>
-                <div id="takePhoto" class="circle" style="display: none;"></div>
                 <div class="row no-gutters justify-content-between">
                     <button id="clear" class="btn btn-outline-secondary">Clear</button>
                     <button id="classify" class="btn btn-outline-secondary">Classify</button>
