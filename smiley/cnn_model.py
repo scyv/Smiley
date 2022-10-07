@@ -11,7 +11,7 @@ def createModel(nCategories):
     model = tf.keras.models.Sequential()
 
     addDenseModel(model, image_size)
-    # addCNNModel(model, image_size)
+    #addCNNModel(model, image_size)
 
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dense(64))
