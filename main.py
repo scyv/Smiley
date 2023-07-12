@@ -42,7 +42,7 @@ def maybe_update_models():
 
 # Initialize the categories mapping, the tensorflow session and the models
 maybe_update_models()
-cnn_train.train()
+# cnn_train.train()
 
 # CNN prediction
 def cnn_predict(input):
