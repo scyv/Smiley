@@ -10,8 +10,11 @@ def createModel(nCategories):
     learning_rate = float(config['CNN']['LEARNING_RATE'])
     model = tf.keras.models.Sequential()
 
-    addDenseModel(model, image_size)
-    #addCNNModel(model, image_size)
+    model.add(tf.keras.layers.Input(shape=(image_size, image_size, 1)))
+
+    addPreprocessing(model)
+    #addDenseModel(model)
+    addCNNModel(model)
 
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dense(64))
@@ -24,13 +27,18 @@ def createModel(nCategories):
 
     return model
 
-def addDenseModel(model, image_size):
-    model.add(tf.keras.layers.Dense(200, activation='relu', input_shape=(image_size, image_size, 1)))
+def addPreprocessing(model):
+    model.add(tf.keras.layers.Rescaling(1.0 / 255))
+    model.add(tf.keras.layers.RandomFlip(mode='horizontal'))
+    model.add(tf.keras.layers.RandomZoom(height_factor=0.2))
+
+def addDenseModel(model):
+    model.add(tf.keras.layers.Dense(200, activation='relu'))
     model.add(tf.keras.layers.Dense(200, activation='relu'))
     model.add(tf.keras.layers.Dense(200, activation='relu'))
 
-def addCNNModel(model, image_size):
-    model.add(tf.keras.layers.Conv2D(50, (3, 3), activation='relu', input_shape=(image_size, image_size, 1)))
+def addCNNModel(model):
+    model.add(tf.keras.layers.Conv2D(50, (3, 3), activation='relu'))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))
     model.add(tf.keras.layers.Conv2D(50, (3, 3), activation='relu'))
     model.add(tf.keras.layers.MaxPooling2D((2, 2)))

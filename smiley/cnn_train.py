@@ -1,7 +1,6 @@
 import configparser
 import os
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import smiley.cnn_model as cnn_model
 import smiley.utils as utils
@@ -28,20 +27,16 @@ def train():
     BATCH_SIZE = int(config['DEFAULT']['TRAIN_BATCH_SIZE'])
     EPOCHS = int(config['CNN']['EPOCHS'])
 
-    train_datagen = ImageDataGenerator(
-        rescale=1. / 255,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True)
-    train_generator = train_datagen.flow_from_directory(
-        utils.CATEGORIES_LOCATION,
+    data = tf.keras.utils.image_dataset_from_directory(
+        directory=utils.CATEGORIES_LOCATION,
+        label_mode='int', #needed by SparseCategoricalCrossentropy in the model
         color_mode='grayscale',
-        target_size=(IMAGE_SIZE, IMAGE_SIZE),
-        batch_size=BATCH_SIZE,
-        class_mode='binary')
+        image_size=(IMAGE_SIZE, IMAGE_SIZE),
+        batch_size=BATCH_SIZE
+    )
 
-    model = cnn_model.createModel(train_generator.num_classes)
+    model = cnn_model.createModel(len(data.class_names))
 
-    model.fit(train_generator, epochs=EPOCHS, callbacks=[ProgressCallback()])
+    model.fit(data, epochs=EPOCHS, callbacks=[ProgressCallback()])
     model.save(MODEL_PATH)
     print("CNN TRAINING END.")
