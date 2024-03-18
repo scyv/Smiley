@@ -13,8 +13,8 @@ def createModel(nCategories):
     model.add(tf.keras.layers.Input(shape=(image_size, image_size, 1)))
 
     addPreprocessing(model)
-    #addDenseModel(model)
-    addCNNModel(model)
+    addDenseModel(model)
+    #addCNNModel(model)
 
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dense(64))

@@ -26,7 +26,7 @@ if not os.path.exists(MODELS_DIRECTORY):
 
 
 # updates the models if the number of classes changed
-def maybe_update_models():
+def load_categories():
     global num_categories
 
     if utils.CATEGORIES_IN_USE == None:
@@ -35,19 +35,13 @@ def maybe_update_models():
         utils.update_categories_in_use()
     num_categories = len(utils.CATEGORIES_IN_USE)
 
-    # CNN model
-    model = cnn_model.createModel(nCategories=num_categories)
-    model.save(MODEL_PATH)
-
 
 # Initialize the categories mapping, the tensorflow session and the models
-maybe_update_models()
-# cnn_train.train()
+load_categories()
 
 # CNN prediction
 def cnn_predict(input):
     model = tf.keras.models.load_model(MODEL_PATH)
-    input = np.reshape(input, (1, -1, IMAGE_SIZE))
     prediction = model.predict(input)
     normalized = tf.nn.softmax(prediction).numpy().flatten()
     return normalized
@@ -80,9 +74,15 @@ def classify():
     # input with pixel values between 0 (black) and 255 (white)
     data = np.array(request.json, dtype=np.uint8)
 
-    # transform pixels to values between -0.5 (white) and 0.5 (black)
-    cnn_input = (((255 - data) / 255.0) - 0.5).reshape(1, IMAGE_SIZE * IMAGE_SIZE)
-
+    # pixels don't need to be rescaled (i.e. to be in range [0, 1]), because the
+    # model contains a Rescaling layer that is applied during training and
+    # inference
+    # https://www.tensorflow.org/api_docs/python/tf/keras/layers/Rescaling 
+    
+    # final shape is (1, IMAGE_SIZE, IMAGE_SIZE, 1) with (BATCH_SIZE, X, Y,
+    # VALUE)
+    cnn_input = data.reshape(1, IMAGE_SIZE, IMAGE_SIZE, 1)
+    
     err = ""  # string with error messages
 
     cnn_output = []
@@ -153,7 +153,7 @@ def train_models():
     utils.update_progress(1)
 
     utils.set_maybe_old(True)
-    maybe_update_models()
+    load_categories()
 
     try:
         cnn_train.train()
