@@ -198,7 +198,12 @@ def console_output():
 @app.route('/api/open-category-folder', methods=['POST'])
 def open_category_folder():
     category = request.json['cat']
-    utils.open_category_folder(category)
+    try:
+        utils.open_category_folder(category)
+    except AttributeError as e:
+        print(e)
+        err = "Could not open the folder in the system file explorer. This function is only supported on Windows."
+        return jsonify(error=err), 500
 
     return 'ok'
 

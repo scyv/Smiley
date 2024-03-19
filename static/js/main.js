@@ -480,9 +480,12 @@ class Main {
       method: "POST",
       contentType: "application/json",
       data: JSON.stringify({ cat: category }),
-    }).fail(() => {
+    }).fail((res) => {
+      //no need to check connection - if the server is down, this function
+      //blocks for some time - too long to provide meaningful user feedback. So,
+      //only handle explicit server errors here.
       this.clearOutput();
-      this.checkConnection();
+      this.displayAlert(`<b>${res.responseJSON.error}</b>`, "danger");      
     });
   }
 
