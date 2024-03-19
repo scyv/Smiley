@@ -57,7 +57,7 @@ def main():
     batchSize = config['DEFAULT']['TRAIN_BATCH_SIZE']
     cnnRate = config['CNN']['LEARNING_RATE']
     cnnEpochs = config['CNN']['EPOCHS']
-    predefined_categories = config['DEFAULT']['PREDEFINED_CATEGORIES'].split(",")
+    predefined_categories = config['DEFAULT']['PREDEFINED_CATEGORIES'].split(',')
     
     data = {'image_size': IMAGE_SIZE, 'batchSize': batchSize,
             'cnnRate': cnnRate, 'cnnEpochs': cnnEpochs, 'maxNumUserCat': maxNumUserCat,
@@ -83,7 +83,7 @@ def classify():
     # VALUE)
     cnn_input = data.reshape(1, IMAGE_SIZE, IMAGE_SIZE, 1)
     
-    err = ""  # string with error messages
+    err = ''  # string with error messages
 
     cnn_output = []
 
@@ -95,12 +95,12 @@ def classify():
         cnn_output = cnn_predict(cnn_input)
         cnn_output = [-1.0 if math.isnan(f) else f for f in cnn_output]
     except (NotFoundError, InvalidArgumentError):
-        err = "No model found. Please train the network."
+        err = 'No model found. Please train the network.'
 
     if utils.is_maybe_old() and len(err) == 0:
-        err = "The model may be outdated. Please retrain the network for updated results."
+        err = 'The model may be outdated. Please retrain the network for updated results.'
 
-    return jsonify(classifiers=["CNN"], results=[np.array(cnn_output).tolist()],
+    return jsonify(classifiers=['CNN'], results=[np.array(cnn_output).tolist()],
                    error=err, categories=utils.get_category_names_in_use())
 
 
@@ -108,38 +108,38 @@ def classify():
 @app.route('/api/add-training-example', methods=['POST'])
 def add_training_example():
     image_size = int(config['DEFAULT']['IMAGE_SIZE'])
-    image = np.array(request.json["img"], dtype=np.uint8).reshape(image_size, image_size, 1)
-    category = request.json["cat"]
+    image = np.array(request.json['img'], dtype=np.uint8).reshape(image_size, image_size, 1)
+    category = request.json['cat']
     utils.add_training_example(image, category)
 
     if utils.not_enough_images():
         err = utils.get_not_enough_images_error()
         return jsonify(error=err)
     
-    return "ok"
+    return 'ok'
 
 
 # Delete a category
 @app.route('/api/delete-category', methods=['POST'])
 def delete_category():
-    category = request.json["cat"]
+    category = request.json['cat']
     utils.delete_category(category)
 
-    return "ok"
+    return 'ok'
 
 
 # Update config parameters
 @app.route('/api/update-config', methods=['POST'])
 def update_config():
-    config.set("CNN", "LEARNING_RATE", request.json["cnnRate"])
-    config.set("CNN", "EPOCHS", request.json["cnnEpochs"])
-    config.set("DEFAULT", "train_batch_size", request.json["batchSize"])
+    config.set('CNN', 'LEARNING_RATE', request.json['cnnRate'])
+    config.set('CNN', 'EPOCHS', request.json['cnnEpochs'])
+    config.set('DEFAULT', 'train_batch_size', request.json['batchSize'])
 
     # Write config back to file
-    with open(config.file, "w") as f:
+    with open(config.file, 'w') as f:
         config.write(f)
 
-    return "ok"
+    return 'ok'
 
 
 # Train model
@@ -159,7 +159,7 @@ def train_models():
         cnn_train.train()
     except BaseException as trainError:
         print (trainError)
-        err = "Unknown error."
+        err = 'Unknown error.'
         return jsonify(error=err)
 
     if utils.train_should_stop():
@@ -169,7 +169,7 @@ def train_models():
 
     utils.reset_progress()
 
-    return "ok"
+    return 'ok'
 
 
 # Retrieve training progress
@@ -185,7 +185,7 @@ def train_progress():
 def stop_training():
     utils.train_should_stop(True)
 
-    return "ok"
+    return 'ok'
 
 
 @app.route('/api/get-console-output')
@@ -197,15 +197,15 @@ def console_output():
 
 @app.route('/api/open-category-folder', methods=['POST'])
 def open_category_folder():
-    category = request.json["cat"]
+    category = request.json['cat']
     utils.open_category_folder(category)
 
-    return "ok"
+    return 'ok'
 
 
 # main
 if __name__ == '__main__':
     # Open webbrowser tab for the app
-    # webbrowser.open_new_tab("http://localhost:5000")
+    # webbrowser.open_new_tab('http://localhost:5000')
 
-    app.run(host="0.0.0.0")
+    app.run(host='0.0.0.0')
