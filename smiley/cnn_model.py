@@ -32,12 +32,12 @@ def createModel(nCategories):
 
     model.add(tf.keras.layers.Input(shape=(image_size, image_size, 1)))
 
-    addPreprocessing(model)
+    #addPreprocessing(model)
     addDenseModel(model)
-    # addCNNModel(model)
+    #addCNNModel(model)
 
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(64))
+   # model.add(tf.keras.layers.Dense(64))
     model.add(tf.keras.layers.Dense(nCategories))
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),

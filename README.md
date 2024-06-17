@@ -25,8 +25,18 @@ the dependencies.
 
 This could be done e.g. by
 ```bash
+Linux/macOs:
 python -m venv ~/.venv/smiley
 source ~/.venv/smiley/bin/activate
+
+Windows:
+python -m venv $HOME/.venv/smiley
+
+# for command line do
+$HOME/.venv/Scripts/activate.bat
+
+# or for powershell respectively do
+$HOME/.venv/Scripts/Activate.ps1
 ```
 
 ```bash

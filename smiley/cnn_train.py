@@ -36,7 +36,7 @@ def train():
     '''
     global EPOCHS
 
-    print('\nCNN TRAINING STARTED.')
+    print('\nTRAINING STARTED.')
     utils.update_progress(1)
     config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(__file__), 'config.ini'))
@@ -63,4 +63,4 @@ def train():
 
     model.fit(data, epochs=EPOCHS, callbacks=[ProgressCallback()])
     model.save(MODEL_PATH)
-    print('CNN TRAINING END.')
+    print('TRAINING END.')
