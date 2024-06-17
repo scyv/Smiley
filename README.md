@@ -29,13 +29,12 @@ Linux/macOs:
 python -m venv ~/.venv/smiley
 source ~/.venv/smiley/bin/activate
 
-Windows:
+Windows Commandline:
+python -m venv %USERPROFILE%/.venv/smiley
+%USERPROFILE%/.venv/Scripts/activate.bat
+
+Windos Powershell
 python -m venv $HOME/.venv/smiley
-
-# for command line do
-$HOME/.venv/Scripts/activate.bat
-
-# or for powershell respectively do
 $HOME/.venv/Scripts/Activate.ps1
 ```
 
